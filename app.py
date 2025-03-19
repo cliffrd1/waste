@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import CORS
 from inference_sdk import InferenceHTTPClient
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Initialize the Roboflow client
 CLIENT = InferenceHTTPClient(
@@ -10,7 +12,6 @@ CLIENT = InferenceHTTPClient(
 )
 
 # Allowed waste types
- 
 ALLOWED_WASTE_TYPES = {"cardboard", "metal", "glass", "paper", "stone", "plastic", "bottle"}
 
 @app.route('/predict', methods=['POST'])
