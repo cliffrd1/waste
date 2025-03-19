@@ -9,6 +9,10 @@ CLIENT = InferenceHTTPClient(
     api_key="Uih1px5V5tb93au696tC"  # Replace with your Roboflow API key
 )
 
+# Allowed waste types
+ 
+ALLOWED_WASTE_TYPES = {"cardboard", "metal", "glass", "paper", "stone", "plastic", "bottle"}
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
@@ -27,8 +31,14 @@ def predict():
         result = CLIENT.infer(file_path, model_id="waste-classification-uwqfy/1")
         print("Roboflow API Response:", result)  # Debug print
 
-        # Return the prediction result
-        return jsonify(result)
+        # Filter predictions to only include allowed waste types
+        filtered_predictions = [
+            pred for pred in result.get("predictions", [])
+            if pred.get("class", "").lower() in ALLOWED_WASTE_TYPES
+        ]
+
+        # Return the filtered prediction result
+        return jsonify({"predictions": filtered_predictions})
     except Exception as e:
         print("Error:", str(e))  # Debug print
         return jsonify({"error": str(e)}), 500
